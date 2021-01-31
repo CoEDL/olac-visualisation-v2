@@ -1,6 +1,6 @@
 const fetch = require("node-fetch");
 const path = require("path");
-const { readFile, writeFile, readdir, ensureDir } = require("fs-extra");
+const { readFile, writeFile, readdir, ensureDir, pathExists, stat } = require("fs-extra");
 const xpath = require("xpath");
 const { trim, compact } = require("lodash");
 let dom = require("xmldom").DOMParser;
@@ -54,6 +54,13 @@ async function downloadLanguageDataFiles({ folder, languages }) {
 }
 
 async function downloadFile({ url, folder }) {
+    const file = path.join(folder, `${path.basename(url)}.html`);
+    if (await pathExists(file)) {
+        // if file is less than one day old don't re download
+        let stats = await stat(file);
+        if (Date.now() - stats.mtime < 86400) return;
+    }
+
     await ensureDir(folder);
     let response = await fetch(url);
     if (response.status !== 200) {
@@ -61,7 +68,6 @@ async function downloadFile({ url, folder }) {
         return;
     }
     const data = await response.text();
-    const file = path.join(folder, `${path.basename(url)}.html`);
     await writeFile(file, data);
 }
 
