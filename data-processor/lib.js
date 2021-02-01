@@ -3,6 +3,7 @@ const path = require("path");
 const { readFile, writeFile, readdir, ensureDir, pathExists, stat } = require("fs-extra");
 const xpath = require("xpath");
 const { trim, compact } = require("lodash");
+const configuration = require("./configuration");
 let dom = require("xmldom").DOMParser;
 dom = new dom({
     locator: {},
@@ -26,23 +27,24 @@ module.exports = {
     downloadFile,
     extractAreaCountries,
     extractAreaData,
+    downloadAreaDataFiles,
     downloadCountryDataFiles,
     downloadLanguageDataFiles,
     extractCountryLanguages,
     extractLanguageData,
 };
 
-async function downloadAreaDataFiles({ folder }) {
+async function downloadAreaDataFiles({ folder, verbose }) {
     for (let url of areaDataFiles) {
         url = `${siteUrl}${url}`;
-        await downloadFile({ url, folder });
+        await downloadFile({ url, folder, verbose });
     }
 }
 
-async function downloadCountryDataFiles({ folder, countries }) {
+async function downloadCountryDataFiles({ folder, countries, verbose }) {
     await ensureDir(folder);
     for (let country of countries) {
-        await downloadFile({ folder, url: country.dataFile });
+        await downloadFile({ folder, url: country.dataFile, verbose });
     }
 }
 
@@ -53,14 +55,15 @@ async function downloadLanguageDataFiles({ folder, languages }) {
     }
 }
 
-async function downloadFile({ url, folder }) {
+async function downloadFile({ url, folder, verbose = false }) {
     const file = path.join(folder, `${path.basename(url)}.html`);
     if (await pathExists(file)) {
         // if file is less than one day old don't re download
         let stats = await stat(file);
-        if (Date.now() - stats.mtime < 86400) return;
+        if ((Date.now() - stats.mtime) / 1000 < configuration.maxDataLifetime) return;
     }
 
+    if (verbose) console.log(`Downloading ${url}`);
     await ensureDir(folder);
     let response = await fetch(url);
     if (response.status !== 200) {
@@ -88,6 +91,7 @@ async function extractAreaCountries({ file }) {
     let nodes = xpath.select("//body/table[2]/tr/td/ul/li", doc);
     let countries = nodes.map((node) => {
         let country = {
+            code: `${path.basename(xpath.select("string(a/@href)", node))}`,
             name: xpath.select("string(a)", node),
             dataFile: `${siteUrl}${xpath.select("string(a/@href)", node)}`,
         };
@@ -103,6 +107,7 @@ async function extractCountryLanguages({ file }) {
     let languages = nodes.map((node) => {
         return {
             name: xpath.select("string(a)", node),
+            code: path.basename(xpath.select("string(a/@href)", node)),
             dataFile: `${siteUrl}${xpath.select("string(a/@href)", node)}`,
         };
     });
@@ -117,7 +122,14 @@ async function extractLanguageData({ file }) {
         otherNamesAndDialects: getLanguageKnownNamesAndDialects({ doc }),
         dataTypes: getDataTypes({ doc }),
     };
-    languageData.resources = getResources({ doc, types: languageData.dataTypes });
+    languageData.resources = getResources({
+        doc,
+        types: languageData.dataTypes,
+    });
+    languageData.summary = {};
+    for (let resource of Object.keys(languageData.resources)) {
+        languageData.summary[resource] = languageData.resources[resource].length;
+    }
     return languageData;
 }
 
