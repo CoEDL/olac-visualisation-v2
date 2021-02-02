@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 const path = require("path");
 const { readFile, writeFile, readdir, ensureDir, pathExists, stat } = require("fs-extra");
 const xpath = require("xpath");
-const { trim, compact } = require("lodash");
+const { trim, compact, flattenDeep, sum } = require("lodash");
 const configuration = require("./configuration");
 let dom = require("xmldom").DOMParser;
 dom = new dom({
@@ -32,6 +32,8 @@ module.exports = {
     downloadLanguageDataFiles,
     extractCountryLanguages,
     extractLanguageData,
+    loadLanguageCoordinateData,
+    loadCountryInformationDatasets,
 };
 
 async function downloadAreaDataFiles({ folder, verbose }) {
@@ -55,8 +57,8 @@ async function downloadLanguageDataFiles({ folder, languages }) {
     }
 }
 
-async function downloadFile({ url, folder, verbose = false }) {
-    const file = path.join(folder, `${path.basename(url)}.html`);
+async function downloadFile({ url, name, folder, verbose = false }) {
+    const file = name ? path.join(folder, name) : path.join(folder, `${path.basename(url)}.html`);
     if (await pathExists(file)) {
         // if file is less than one day old don't re download
         let stats = await stat(file);
@@ -75,13 +77,14 @@ async function downloadFile({ url, folder, verbose = false }) {
 }
 
 async function extractAreaData({ folder }) {
-    let countryData = {};
+    let countryData = [];
     for (let file of await readdir(folder)) {
-        let country = path.basename(file, ".html");
+        // let area = path.basename(file, ".html");
         file = path.join(folder, file);
         let countries = await extractAreaCountries({ file });
-        countryData[country] = countries;
+        countryData.push(countries);
     }
+    countryData = flattenDeep(countryData);
     return countryData;
 }
 
@@ -115,10 +118,13 @@ async function extractCountryLanguages({ file }) {
 }
 
 async function extractLanguageData({ file }) {
+    const code = path.basename(file, ".html");
     const data = await readFile(file);
     const doc = dom.parseFromString(data.toString());
 
     let languageData = {
+        code,
+        name: getLanguageName({ doc }),
         otherNamesAndDialects: getLanguageKnownNamesAndDialects({ doc }),
         dataTypes: getDataTypes({ doc }),
     };
@@ -130,7 +136,15 @@ async function extractLanguageData({ file }) {
     for (let resource of Object.keys(languageData.resources)) {
         languageData.summary[resource] = languageData.resources[resource].length;
     }
+    languageData.totalResources = sum(
+        Object.keys(languageData.resources).map((resource) => languageData.summary[resource])
+    );
     return languageData;
+}
+
+function getLanguageName({ doc }) {
+    let node = xpath.select("//body/table[1]/tr/td[2]", doc)[0];
+    return node.textContent;
 }
 
 function getLanguageKnownNamesAndDialects({ doc }) {
@@ -179,4 +193,50 @@ function getResources({ doc, types }) {
         }
     }
     return resources;
+}
+
+async function loadLanguageCoordinateData() {
+    // load language coordinate info
+    let coordinates = await readFile("languages.csv");
+    let languageCoordinateData = {};
+    for (line of coordinates.toString().split("\n")) {
+        line = line.split(",").map((e) => trim(e));
+
+        let coords = [];
+        let code = line[0];
+        if (line.length === 10) {
+            coords = [line[8], line[9]];
+        } else if (line.length === 8) {
+            coords = [line[4], line[6]];
+        } else {
+            console.log(`ERROR: ${line} in languages.csv seems to be an unexpected length`);
+        }
+        if (code) {
+            languageCoordinateData[code] = {
+                type: "Feature",
+                geometry: {
+                    type: "Point",
+                    coordinates: coords,
+                },
+                properties: {
+                    code: code,
+                },
+            };
+        }
+    }
+    return languageCoordinateData;
+}
+
+async function loadCountryInformationDatasets({ dataBasePath }) {
+    await downloadFile({
+        url: configuration.country.codes,
+        folder: dataBasePath,
+        name: "country-codes.json",
+    });
+
+    await downloadFile({
+        url: configuration.country.geojson,
+        folder: dataBasePath,
+        name: "countries.geojson",
+    });
 }

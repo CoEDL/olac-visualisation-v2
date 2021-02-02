@@ -5,19 +5,12 @@ const {
     extractAreaData,
     extractCountryLanguages,
     extractLanguageData,
+    loadLanguageCoordinateData,
+    loadCountryInformationDatasets,
 } = require("./lib");
 const path = require("path");
-const {
-    writeFile,
-    stat,
-    pathExists,
-    readdir,
-    readJSON,
-    writeJSON,
-    ensureDir,
-    move,
-} = require("fs-extra");
-const { flattenDeep } = require("lodash");
+const { readFile, writeFile, readdir, readJSON, writeJSON, ensureDir } = require("fs-extra");
+const { trim } = require("lodash");
 const configuration = require("./configuration");
 
 const args = require("yargs/yargs")(process.argv.slice(2)).options({
@@ -29,6 +22,14 @@ const args = require("yargs/yargs")(process.argv.slice(2)).options({
         default: false,
         type: "boolean",
     },
+    download: {
+        default: true,
+        type: "boolean",
+    },
+    extract: {
+        default: true,
+        type: "boolean",
+    },
 }).argv;
 
 (async () => {
@@ -36,80 +37,95 @@ const args = require("yargs/yargs")(process.argv.slice(2)).options({
         console.log(`--folder required`);
     }
     const verbose = args.verbose;
+    const dataBasePath = args.folder;
 
-    // indexes location
-    const indexesPath = path.join(args.folder, "indexes");
-    ensureDir(indexesPath);
+    const areaDataPath = path.join(dataBasePath, "area");
+    const countryDataPath = path.join(dataBasePath, "countries");
+    const languageDataPath = path.join(dataBasePath, "languages");
+    const indexesDataPath = path.join(dataBasePath, "indexes");
 
-    // get area data files
-    let folder = path.join(args.folder, "area");
-    await downloadAreaDataFiles({ folder, verbose });
+    await ensureDir(areaDataPath);
+    await ensureDir(countryDataPath);
+    await ensureDir(languageDataPath);
+    await ensureDir(indexesDataPath);
 
-    // extract country list
-    let countryData = await extractAreaData({ folder });
+    // get world country data files - data and geojson
+    await loadCountryInformationDatasets({ dataBasePath });
+
+    // load language coordinate info
+    const languageCoordinateData = await loadLanguageCoordinateData();
+
+    // get area data files and extract countries list
+    if (args.download) await downloadAreaDataFiles({ folder: areaDataPath, verbose });
+    let countries = await extractAreaData({ folder: areaDataPath });
 
     // get country data files
-    folder = path.join(args.folder, "countries");
-    for (let area of Object.keys(countryData)) {
-        let countries = countryData[area];
-        await downloadCountryDataFiles({ folder, countries, verbose });
+    if (args.download) {
+        await downloadCountryDataFiles({
+            folder: countryDataPath,
+            countries,
+            verbose,
+        });
     }
 
     // extract country languages
     let languageDataFiles = {};
-    let files = await readdir(folder);
+    let files = await readdir(countryDataPath);
     for (let file of files) {
-        let languages = await extractCountryLanguages({ file: path.join(folder, file) });
+        let countryCode = path.basename(file, ".html");
+        let languages = await extractCountryLanguages({
+            file: path.join(countryDataPath, file),
+        });
         languages.forEach((language) => {
             languageDataFiles[language.code] = language;
         });
+        countries = countries.map((country) => {
+            if (country.code === countryCode) country.languages = languages;
+            return country;
+        });
     }
-    // console.log(languageDataFiles);
 
     // download language data files and extract the data
-    folder = path.join(args.folder, "languages");
-    for (let code of Object.keys(languageDataFiles)) {
+    for (let code of Object.keys(languageDataFiles).sort()) {
         let language = languageDataFiles[code];
-        await downloadFile({ folder: path.join(folder, "html"), url: language.dataFile, verbose });
-
-        let htmlFile = path.join(folder, "html", `${code}.html`);
-        let jsonFile = path.join(folder, "json", `${code}.json`);
-
-        if (await pathExists(jsonFile)) {
-            // if file is less than one day old don't re-process
-            let stats = await stat(jsonFile);
-            if ((Date.now() - stats.mtime) / 1000 < configuration.maxDataLifetime) continue;
+        if (args.download) {
+            await downloadFile({
+                folder: path.join(languageDataPath, "html"),
+                url: language.dataFile,
+                verbose,
+            });
         }
 
-        if (verbose) console.log(`Processing ${htmlFile}`);
-        let data = await extractLanguageData({ file: htmlFile });
-        await writeFile(jsonFile, JSON.stringify(data));
+        let htmlFile = path.join(languageDataPath, "html", `${code}.html`);
+        let jsonFile = path.join(languageDataPath, "json", `${code}.json`);
+
+        if (args.extract) {
+            if (verbose) console.log(`Extracting data ${htmlFile}`);
+            let data = await extractLanguageData({ file: htmlFile });
+
+            let coords = languageCoordinateData[code];
+            if (!coords) {
+                console.log(`ERROR: Couldn't find coordinates for ${code}`);
+            } else {
+                coords.properties.name = languageDataFiles[code].name;
+                coords.properties.dataFile = languageDataFiles[code].dataFile;
+                coords.properties.totalResources = data.totalResources;
+                coords.properties.summary = data.summary;
+                data = {
+                    ...data,
+                    ...languageDataFiles[code],
+                    geojson: coords,
+                };
+            }
+            await writeFile(jsonFile, JSON.stringify(data));
+        }
     }
 
-    // get country data files - data and geojson
-    await downloadFile({ url: configuration.country.codes, folder: args.folder });
-    await move(
-        path.join(args.folder, "all.json.html"),
-        path.join(args.folder, "country-codes.json"),
-        {
-            overwrite: true,
-        }
-    );
-
-    await downloadFile({ url: configuration.country.geojson, folder: args.folder });
-    await move(
-        path.join(args.folder, "countries.geojson.html"),
-        path.join(args.folder, "countries.geojson"),
-        { overwrite: true }
-    );
-
     // write data indexes
-    let area = countryData;
-    await writeJSON(path.join(indexesPath, "area.json"), area);
 
-    let countriesGeoJSON = await readJSON(path.join(args.folder, "countries.geojson"));
-    let countryCodesJSON = await readJSON(path.join(args.folder, "country-codes.json"));
-    let countries = flattenDeep(Object.keys(countryData).map((area) => countryData[area]));
+    //   write countries index
+    let countriesGeoJSON = await readJSON(path.join(dataBasePath, "countries.geojson"));
+    let countryCodesJSON = await readJSON(path.join(dataBasePath, "country-codes.json"));
     countries = countries.map((country) => {
         let countryData = countryCodesJSON.filter((c) => c["alpha-2"] === country.code)[0];
         let countryJSON = countriesGeoJSON.features.filter((c) => {
@@ -118,13 +134,22 @@ const args = require("yargs/yargs")(process.argv.slice(2)).options({
         country = {
             ...country,
             ...countryData,
-            bounds: countryJSON,
+            geojson: countryJSON,
         };
-        if (!country.bounds)
-            console.log(`Couldn't find bounds for ${country.name}, ${country.code}`);
+        if (!country.geojson) {
+            console.log(`ERROR: Couldn't find bounds for ${country.name}, ${country.code}`);
+        }
         return country;
     });
-    await writeJSON(path.join(indexesPath, "countries.json"), countries);
+    await writeJSON(path.join(indexesDataPath, "countries.json"), countries);
 
+    //  write languages index
+    files = await readdir(path.join(languageDataPath, "json"));
+    let languages = [];
+    for (let file of files) {
+        let data = await readJSON(path.join(languageDataPath, "json", file));
+        languages.push(data.geojson);
+    }
+    await writeJSON(path.join(indexesDataPath, "languages.json"), languages);
     process.exit();
 })();

@@ -30,9 +30,7 @@ it(`should be able to extract area countries`, async () => {
         file: path.join(folder, "africa.html"),
     });
     expect(countries.length).toEqual(55);
-
-    let countryData = await extractAreaData({ folder });
-    expect(Object.keys(countryData)).toEqual(["africa"]);
+    countries = await extractAreaData({ folder });
 });
 it(`should be able to download country data files`, async () => {
     let folder = path.join(__dirname, "data", "countries");
@@ -74,7 +72,12 @@ it("should be able to extract language data", async () => {
 
     let file = path.join(folder, "arq.html");
     let data = await extractLanguageData({ file });
-    expect(Object.keys(data)).toEqual(["otherNamesAndDialects", "dataTypes", "resources"]);
+    expect(Object.keys(data)).toEqual([
+        "otherNamesAndDialects",
+        "dataTypes",
+        "resources",
+        "summary",
+    ]);
     expect(data.dataTypes).toEqual([
         "Primary texts",
         "Lexical resources",
