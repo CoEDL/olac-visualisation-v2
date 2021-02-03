@@ -1,10 +1,11 @@
-const path = require("path");
+const CopyPlugin = require("copy-webpack-plugin");
+
 module.exports = {
-    configureWebpack: {
-        devServer: {
-            contentBase: path.join(__dirname, "dist", "repository"),
-            writeToDisk: true,
-            serveIndex: true,
-        },
-    },
+  configureWebpack: {
+    plugins: [
+      new CopyPlugin({
+        patterns: [{ from: "data-processor/data", to: "repository" }],
+      }),
+    ],
+  },
 };
