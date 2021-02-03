@@ -1,6 +1,6 @@
 <template>
-  <div class="text-yellow-600 text-4xl">
-    app
+  <div>
+    <router-view />
   </div>
 </template>
 
