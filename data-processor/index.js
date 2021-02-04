@@ -115,11 +115,10 @@ const args = require("yargs/yargs")(process.argv.slice(2)).options({
       if (!coords) {
         console.log(`ERROR: Couldn't find coordinates for ${code}`);
       } else {
-        // coords.properties.name = languageDataFiles[code].name;
-        // coords.properties.dataFile = languageDataFiles[code].dataFile;
-        // coords.properties.totalResources = data.totalResources;
+        coords.properties.name = languageDataFiles[code].name;
         coords.properties.total = data.totalResources;
         // coords.properties.summary = data.summary;
+        // coords.properties.dataFile = languageDataFiles[code].dataFile;
         data = {
           ...data,
           ...languageDataFiles[code],
