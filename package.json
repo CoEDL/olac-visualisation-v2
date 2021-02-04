@@ -9,6 +9,8 @@
     "dataprocessor:test:watch": "jest --watch --rootDir data-processor --testMatch '**/*.spec.js'"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.2",
+    "@fortawesome/fontawesome-svg-core": "^1.2.34",
     "@tailwindcss/postcss7-compat": "^2.0.2",
     "autoprefixer": "^9.8.6",
     "core-js": "^3.6.5",
