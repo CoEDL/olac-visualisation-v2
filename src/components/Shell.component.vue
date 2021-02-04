@@ -1,11 +1,15 @@
 <template>
   <div class="text-4xl">
-    main shell
+    <map-component />
   </div>
 </template>
 
 <script>
+import MapComponent from "./Map.component.vue";
 export default {
+  components: {
+    MapComponent,
+  },
   data() {
     return {};
   },
