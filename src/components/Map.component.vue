@@ -1,9 +1,22 @@
 <template>
-  <div>
-    <div ref="map" class="style-map" :style="{ width: mapWidth }"></div>
-    <ui-button type="primary" @click="addLanguageLayer">
+  <div class="relative">
+    <div
+      ref="map"
+      class="style-map absolute"
+      :style="{ width: mapWidth }"
+    ></div>
+    <div class="absolute top-2 left-2 ">
+      <div
+        @click="centerMapAndZoomOut"
+        size="mini"
+        class="border-2 border-gray-300 py-1 px-3 bg-white rounded-lg"
+      >
+        <i class="fas fa-crosshairs style-button-image"></i>
+      </div>
+    </div>
+    <!-- <ui-button type="primary" @click="addLanguageLayer">
       render languages
-    </ui-button>
+    </ui-button> -->
   </div>
 </template>
 
@@ -18,6 +31,7 @@ export default {
     return {
       map: undefined,
       mapWidth: this.setMapWidth(),
+      mapCentre: [14.810891, 23.962169],
       circle: {
         stroke: {
           color: "#2e3131",
@@ -70,7 +84,7 @@ export default {
         zoom: 1,
         minZoom: 1,
         maxZoom: 7,
-        center: [14.810891, 23.962169],
+        center: this.mapCentre,
       });
       this.map.addControl(
         new mapboxgl.NavigationControl({
@@ -152,6 +166,13 @@ export default {
         }
       });
     },
+    centerMapAndZoomOut() {
+      this.map.flyTo({
+        center: this.mapCentre,
+        zoom: 1,
+        bearing: 0,
+      });
+    },
   },
 };
 </script>
@@ -159,6 +180,5 @@ export default {
 <style scoped>
 .style-map {
   height: 800px;
-  width: 1200px;
 }
 </style>
