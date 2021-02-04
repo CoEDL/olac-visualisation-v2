@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div ref="map" class="style-map"></div>
+    <div ref="map" class="style-map" :style="{ width: mapWidth }"></div>
     <ui-button type="primary" @click="addLanguageLayer">
       render languages
     </ui-button>
@@ -18,6 +18,7 @@ export default {
   data() {
     return {
       map: undefined,
+      mapWidth: this.setMapWidth(),
       colours: {
         red: [10, "#f03434"],
         yellow: [100, "#f5ab35"],
@@ -46,6 +47,15 @@ export default {
     this.renderMap();
   },
   methods: {
+    setMapWidth() {
+      if (window.innerWidth < 768) {
+        return "0px";
+      } else if (window.innerWidth <= 1024) {
+        return `${window.innerWidth}px`;
+      } else {
+        return "1024px";
+      }
+    },
     renderMap() {
       this.map = new mapboxgl.Map({
         container: this.$refs.map,
