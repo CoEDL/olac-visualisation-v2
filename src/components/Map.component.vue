@@ -8,7 +8,6 @@
 </template>
 
 <script>
-import { chunk } from "lodash";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
 import { mapBoxStyle, accessToken } from "../configuration";
@@ -40,7 +39,7 @@ export default {
   },
   watch: {
     languages: function() {
-      if (this.languages.length) this.addLanguageLayer();
+      if (this.languages.length) this.renderLanguages();
     },
   },
   mounted() {
@@ -65,56 +64,62 @@ export default {
         zoom: 1,
         minZoom: 1,
         maxZoom: 7,
+        center: [14.810891, 23.962169],
       });
       this.map.addControl(
         new mapboxgl.NavigationControl({
           showCompass: false,
         })
       );
+      this.map.on("load", () => {
+        this.map.setZoom(1);
+        this.renderLanguages();
+      });
+    },
+    renderLanguages() {
+      this.removeLayersAndSources();
+      this.addLanguageSource();
+      this.addLanguageLayer();
+    },
+    removeLayersAndSources() {
+      if (this.map.getLayer(`languages`)) this.map.removeLayer(`languages`);
+      if (this.map.getSource(`languages`)) this.map.removeSource(`languages`);
+    },
+    addLanguageSource() {
+      let languages = [...this.$store.state.languages];
+      this.map.addSource(`languages`, {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: languages,
+        },
+      });
     },
     addLanguageLayer() {
-      let languages = chunk(this.$store.state.languages, 1000);
-      for (let count in languages) {
-        try {
-          if (this.map.getLayer(`languages${count}`))
-            this.map.removeLayer(`languages${count}`);
-          if (this.map.getSource(`languages${count}`))
-            this.map.removeSource(`languages${count}`);
-        } catch (error) {}
-        this.map.addSource(`languages${count}`, {
-          type: "geojson",
-          data: {
-            type: "FeatureCollection",
-            features: languages[count],
+      this.map.addLayer({
+        id: `languages`,
+        type: "circle",
+        source: `languages`,
+        paint: {
+          // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
+          // with three steps to implement three types of circles:
+          //   * red circles when totalResources < 10
+          //   * orange circles when 10 < totalResource < 100
+          //   * green circles when totalResources > 100
+          "circle-color": [
+            "step",
+            ["get", "total"],
+            this.colours.red[1],
+            this.colours.red[0],
+            this.colours.yellow[1],
+            this.colours.yellow[0],
+            this.colours.green[1],
+          ],
+          "circle-radius": {
+            stops: this.zoom,
           },
-        });
-
-        this.map.addLayer({
-          id: `languages${count}`,
-          type: "circle",
-          source: `languages${count}`,
-          paint: {
-            // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
-            // with three steps to implement three types of circles:
-            //   * red circles when totalResources < 10
-            //   * orange circles when 10 < totalResource < 100
-            //   * green circles when totalResources > 100
-            "circle-color": [
-              "step",
-              ["get", "total"],
-              this.colours.red[1],
-              this.colours.red[0],
-              this.colours.yellow[1],
-              this.colours.yellow[0],
-              this.colours.green[1],
-            ],
-            "circle-radius": {
-              stops: this.zoom,
-            },
-          },
-        });
-      }
-      this.map.setZoom(1);
+        },
+      });
     },
   },
 };
