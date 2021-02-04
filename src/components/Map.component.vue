@@ -18,6 +18,12 @@ export default {
     return {
       map: undefined,
       mapWidth: this.setMapWidth(),
+      circle: {
+        stroke: {
+          color: "#2e3131",
+          width: 1,
+        },
+      },
       colours: {
         red: [10, "#f03434"],
         yellow: [100, "#f5ab35"],
@@ -27,8 +33,8 @@ export default {
         [1, 2],
         [2, 3],
         [4, 4],
-        [5, 5],
-        [6, 6],
+        [5, 6],
+        [6, 8],
       ],
     };
   },
@@ -115,10 +121,35 @@ export default {
             this.colours.yellow[0],
             this.colours.green[1],
           ],
+          "circle-stroke-color": this.circle.stroke.color,
+          "circle-stroke-width": [
+            "step",
+            ["zoom"],
+            0,
+            4,
+            this.circle.stroke.width,
+          ],
           "circle-radius": {
             stops: this.zoom,
           },
         },
+      });
+      this.map.on("click", "languages", e => {
+        if (this.map.getZoom() > 3) {
+          const language = e.features[0].properties;
+          console.log(language);
+          // this.$store.dispatch("loadLanguage", { code: language.code });
+        }
+      });
+      this.map.on("mouseenter", "languages", () => {
+        if (this.map.getZoom() > 3) {
+          this.map.getCanvas().style.cursor = "pointer";
+        }
+      });
+      this.map.on("mouseleave", "languages", () => {
+        if (this.map.getZoom() > 3) {
+          this.map.getCanvas().style.cursor = "";
+        }
       });
     },
   },
