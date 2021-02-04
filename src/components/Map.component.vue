@@ -34,23 +34,55 @@ export default {
       mapHeight: this.setMapHeight(),
       mapCentre: [14.810891, 23.962169],
       circle: {
+        color: [
+          "step",
+          ["get", "total"],
+          "#f03434",
+          10,
+          "#f5ab35",
+          100,
+          "#26a656",
+        ],
         stroke: {
-          color: "#2e3131",
-          width: 1,
+          width: ["step", ["zoom"], 0, 4, 1],
+          color: ["step", ["zoom"], "#fff", 5, "#000"],
         },
+        radius: [
+          "step",
+          ["zoom"],
+          ["interpolate", ["linear"], ["get", "total"], 10, 1, 100, 2, 1000, 4],
+          0,
+          ["interpolate", ["linear"], ["get", "total"], 10, 2, 100, 4, 1000, 6],
+          3,
+          [
+            "interpolate",
+            ["linear"],
+            ["get", "total"],
+            10,
+            4,
+            100,
+            8,
+            1000,
+            12,
+            10000,
+            16,
+          ],
+          5,
+          [
+            "interpolate",
+            ["linear"],
+            ["get", "total"],
+            10,
+            5,
+            100,
+            10,
+            1000,
+            15,
+            10000,
+            20,
+          ],
+        ],
       },
-      colours: {
-        red: [10, "#f03434"],
-        yellow: [100, "#f5ab35"],
-        green: [100, "#26a65b"],
-      },
-      zoom: [
-        [1, 2],
-        [2, 3],
-        [4, 4],
-        [5, 6],
-        [6, 8],
-      ],
     };
   },
   computed: {
@@ -65,7 +97,6 @@ export default {
   },
   mounted() {
     this.renderMap();
-    console.log(this.mapHeight, this.mapWidth);
   },
   methods: {
     setMapWidth() {
@@ -114,6 +145,7 @@ export default {
     },
     addLanguageSource() {
       let languages = [...this.$store.state.languages];
+      // languages = languages.slice(0, 100);
       this.map.addSource(`languages`, {
         type: "geojson",
         data: {
@@ -128,31 +160,10 @@ export default {
         type: "circle",
         source: `languages`,
         paint: {
-          // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
-          // with three steps to implement three types of circles:
-          //   * red circles when totalResources < 10
-          //   * orange circles when 10 < totalResource < 100
-          //   * green circles when totalResources > 100
-          "circle-color": [
-            "step",
-            ["get", "total"],
-            this.colours.red[1],
-            this.colours.red[0],
-            this.colours.yellow[1],
-            this.colours.yellow[0],
-            this.colours.green[1],
-          ],
+          "circle-color": this.circle.color,
           "circle-stroke-color": this.circle.stroke.color,
-          "circle-stroke-width": [
-            "step",
-            ["zoom"],
-            0,
-            4,
-            this.circle.stroke.width,
-          ],
-          "circle-radius": {
-            stops: this.zoom,
-          },
+          "circle-stroke-width": this.circle.stroke.width,
+          "circle-radius": this.circle.radius,
         },
       });
       this.map.on("click", "languages", e => {
