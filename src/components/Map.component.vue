@@ -2,8 +2,8 @@
   <div class="relative">
     <div
       ref="map"
-      class="style-map absolute"
-      :style="{ width: mapWidth }"
+      class="absolute"
+      :style="{ width: mapWidth, height: mapHeight }"
     ></div>
     <div class="absolute top-2 left-2 ">
       <div
@@ -31,6 +31,7 @@ export default {
     return {
       map: undefined,
       mapWidth: this.setMapWidth(),
+      mapHeight: this.setMapHeight(),
       mapCentre: [14.810891, 23.962169],
       circle: {
         stroke: {
@@ -64,15 +65,21 @@ export default {
   },
   mounted() {
     this.renderMap();
+    console.log(this.mapHeight, this.mapWidth);
   },
   methods: {
     setMapWidth() {
-      if (window.innerWidth < 768) {
-        return "0px";
-      } else if (window.innerWidth <= 1024) {
+      if (window.innerWidth < 1024) {
         return `${window.innerWidth}px`;
       } else {
-        return "1024px";
+        return "100%";
+      }
+    },
+    setMapHeight() {
+      if (window.innerWidth < 1024) {
+        return `${window.innerHeight - 80}px`;
+      } else {
+        return `${window.innerHeight}px`;
       }
     },
     renderMap() {
@@ -177,8 +184,4 @@ export default {
 };
 </script>
 
-<style scoped>
-.style-map {
-  height: 800px;
-}
-</style>
+<style scoped></style>
