@@ -8,18 +8,21 @@
       <div class="text-base text-center">data visualisation</div>
     </div>
     <about-component />
-    <legend-component />
+    <legend-component class="p-6 border border-gray-200" />
+    <data-inspector-component class="mt-2" />
   </div>
 </template>
 
 <script>
 import LegendComponent from "./Legend.component.vue";
 import AboutComponent from "./About.component.vue";
+import DataInspectorComponent from "./DataInspector.component.vue";
 const logo = require("@/assets/logo.png");
 export default {
   components: {
     AboutComponent,
     LegendComponent,
+    DataInspectorComponent,
   },
   data() {
     return {
