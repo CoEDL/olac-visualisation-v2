@@ -1,5 +1,9 @@
 import Vue from "vue";
 import Vuex from "vuex";
+const repository =
+  process.env.NODE_ENV === "development"
+    ? "/repository"
+    : "/olacvis/repository";
 
 Vue.use(Vuex);
 
@@ -14,7 +18,7 @@ export const mutations = {
 
 export const actions = {
   async loadData({ commit }) {
-    let response = await fetch("/repository/indexes/countries.json");
+    let response = await fetch(`${repository}/indexes/countries.json`);
     if (response.status !== 200) {
       console.log(`Unable to load country data`);
       return;
@@ -22,7 +26,7 @@ export const actions = {
     let countries = await response.json();
     commit("saveCountries", countries);
 
-    response = await fetch("/repository/indexes/languages.json");
+    response = await fetch(`${repository}/indexes/languages.json`);
     if (response.status !== 200) {
       console.log(`Unable to load country data`);
       return;

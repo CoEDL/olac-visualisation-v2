@@ -6,17 +6,17 @@ Vue.use(VueRouter);
 import ShellComponent from "@/components/Shell.component.vue";
 
 const routes = [
-    {
-        path: "/",
-        name: "Home",
-        component: ShellComponent,
-    },
+  {
+    path: "/",
+    name: "Home",
+    component: ShellComponent,
+  },
 ];
 
 const router = new VueRouter({
-    mode: "history",
-    base: process.env.BASE_URL,
-    routes,
+  mode: "history",
+  base: process.env.BASE_URL,
+  routes,
 });
 
 export default router;
