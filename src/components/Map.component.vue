@@ -23,7 +23,7 @@
 <script>
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
-import { mapBoxStyle, accessToken } from "../configuration";
+import { mapBoxStyle, accessToken, resourceSteps } from "../configuration";
 mapboxgl.accessToken = accessToken;
 
 export default {
@@ -37,11 +37,11 @@ export default {
         color: [
           "step",
           ["get", "total"],
-          "#f03434",
-          10,
-          "#f5ab35",
-          100,
-          "#26a656",
+          resourceSteps[0].color,
+          resourceSteps[0].count,
+          resourceSteps[1].color,
+          resourceSteps[1].count,
+          resourceSteps[2].color,
         ],
         stroke: {
           width: ["step", ["zoom"], 0, 4, 1],

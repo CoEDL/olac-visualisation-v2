@@ -8,15 +8,18 @@
       <div class="text-base text-center">data visualisation</div>
     </div>
     <about-component />
+    <legend-component />
   </div>
 </template>
 
 <script>
+import LegendComponent from "./Legend.component.vue";
 import AboutComponent from "./About.component.vue";
 const logo = require("@/assets/logo.png");
 export default {
   components: {
     AboutComponent,
+    LegendComponent,
   },
   data() {
     return {
