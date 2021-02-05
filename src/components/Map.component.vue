@@ -171,14 +171,24 @@ export default {
           const language = e.features[0].properties;
           const coordinates = e.features[0].geometry.coordinates.slice();
           const popupContent = `<div class="bg-gray-100 border-gray-400 border rounded p-6 text-gray-700 text-center"><div class="text-xl">${language.name}</div><div class="text-base">${language.total} resources</div></div>`;
-          this.popup = new mapboxgl.Popup({
-            closeButton: false,
-            maxWidth: "none",
-          })
-            .setLngLat(coordinates)
-            .setHTML(popupContent)
-            .addTo(this.map);
-          // this.$store.dispatch("loadLanguage", { code: language.code });
+          if (this.popup) this.popup.remove();
+          this.$nextTick(() => {
+            this.popup = new mapboxgl.Popup({
+              closeButton: false,
+              maxWidth: "none",
+            })
+              .setLngLat(coordinates)
+              .setHTML(popupContent)
+              .addTo(this.map);
+
+            // wipe selected language on close
+            const $store = this.$store;
+            this.popup.on("close", function() {
+              $store.dispatch("loadLanguage", {});
+            });
+            // load selected language data
+            this.$store.dispatch("loadLanguage", { code: language.code });
+          });
         }
       });
       this.map.on("mouseenter", "languages", () => {
