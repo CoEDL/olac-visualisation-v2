@@ -169,7 +169,15 @@ export default {
       this.map.on("click", "languages", e => {
         if (this.map.getZoom() > 3) {
           const language = e.features[0].properties;
-          console.log(language);
+          const coordinates = e.features[0].geometry.coordinates.slice();
+          const popupContent = `<div class="bg-gray-100 border-gray-400 border rounded p-6 text-gray-700 text-center"><div class="text-xl">${language.name}</div><div class="text-base">${language.total} resources</div></div>`;
+          this.popup = new mapboxgl.Popup({
+            closeButton: false,
+            maxWidth: "none",
+          })
+            .setLngLat(coordinates)
+            .setHTML(popupContent)
+            .addTo(this.map);
           // this.$store.dispatch("loadLanguage", { code: language.code });
         }
       });
@@ -195,4 +203,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style lang="scss">
+.mapboxgl-popup-content {
+  @apply bg-yellow-300;
+}
+</style>
