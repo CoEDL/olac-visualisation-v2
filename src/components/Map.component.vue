@@ -14,9 +14,6 @@
         <i class="fas fa-crosshairs style-button-image"></i>
       </div>
     </div>
-    <!-- <ui-button type="primary" @click="addLanguageLayer">
-      render languages
-    </ui-button> -->
   </div>
 </template>
 
@@ -90,11 +87,6 @@ export default {
       return this.$store.state.languages;
     },
   },
-  watch: {
-    languages: function() {
-      if (this.languages.length) this.renderLanguages();
-    },
-  },
   mounted() {
     this.renderMap();
   },
@@ -131,7 +123,12 @@ export default {
       );
       this.map.on("load", () => {
         this.map.setZoom(1);
-        this.renderLanguages();
+        console.log("map ready");
+        if (this.languages?.length) {
+          this.renderLanguages();
+        } else {
+          setTimeout(this.renderLanguages, 1000);
+        }
       });
     },
     renderLanguages() {
