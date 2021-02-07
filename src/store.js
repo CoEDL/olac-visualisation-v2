@@ -39,21 +39,21 @@ export default new Vuex.Store({
 });
 
 async function loadData({ commit }) {
-  let response = await fetch(`${repository}/indexes/countries.json`);
-  if (response.status !== 200) {
-    console.log(`Unable to load country data`);
-    return;
-  }
-  let countries = await response.json();
-  commit("saveCountries", countries);
-
-  response = await fetch(`${repository}/indexes/languages.json`);
+  let response = await fetch(`${repository}/indexes/languages.json`);
   if (response.status !== 200) {
     console.log(`Unable to load language data`);
     return;
   }
   let languages = await response.json();
   commit("saveLanguages", languages);
+
+  response = await fetch(`${repository}/indexes/countries.json`);
+  if (response.status !== 200) {
+    console.log(`Unable to load country data`);
+    return;
+  }
+  let countries = await response.json();
+  commit("saveCountries", countries);
 }
 
 async function loadLanguage({ commit }, { code }) {
