@@ -11,8 +11,8 @@
 
 <script>
 import MapComponent from "./Map.component.vue";
-import TopbarComponent from "./topbar.component.vue";
-import SidebarComponent from "./sidebar.component.vue";
+import TopbarComponent from "./Topbar.component.vue";
+import SidebarComponent from "./Sidebar.component.vue";
 export default {
   components: {
     TopbarComponent,
