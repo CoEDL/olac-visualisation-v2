@@ -1,3 +1,4 @@
+import "element-ui/lib/theme-chalk/index.css";
 import "./assets/styles.scss";
 import Vue from "vue";
 import App from "./App.vue";
@@ -8,10 +9,10 @@ import fontawesome from "@fortawesome/fontawesome-free/js/all";
 import { config } from "@fortawesome/fontawesome-svg-core";
 config.autoReplaceSvg = "nest";
 
-import KeenUI from "keen-ui";
-import "keen-ui/dist/keen-ui.css";
+import ElementUI from "element-ui";
+import locale from "element-ui/lib/locale/lang/en";
 
-Vue.use(KeenUI);
+Vue.use(ElementUI, { locale });
 Vue.config.productionTip = false;
 
 new Vue({
