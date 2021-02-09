@@ -3,25 +3,40 @@
     <div class="flex flex-row space-x-4">
       <div
         class="rounded-full h-6 w-6"
-        :style="{ 'background-color': resourceSteps[0].color }"
+        :style="{ 'background-color': resourceSteps[scheme][0].color }"
       ></div>
-      <div class="-mt-1">< {{ resourceSteps[0].count }} resources</div>
+      <div class="-mt-1">< {{ resourceSteps[scheme][0].count }} resources</div>
     </div>
     <div class="flex flex-row space-x-4">
       <div
         class="rounded-full h-6 w-6"
-        :style="{ 'background-color': resourceSteps[1].color }"
+        :style="{ 'background-color': resourceSteps[scheme][1].color }"
       ></div>
       <div class="-mt-1">
-        {{ resourceSteps[0].count }} < resources < {{ resourceSteps[1].count }}
+        {{ resourceSteps[scheme][0].count }} < resources <
+        {{ resourceSteps[scheme][1].count }}
       </div>
     </div>
     <div class="flex flex-row space-x-4">
       <div
         class="rounded-full h-6 w-6"
-        :style="{ 'background-color': resourceSteps[2].color }"
+        :style="{ 'background-color': resourceSteps[scheme][2].color }"
       ></div>
-      <div class="-mt-1">> {{ resourceSteps[1].count }} resources</div>
+      <div class="-mt-1">
+        {{ resourceSteps[scheme][1].count }} < resources <
+        {{ resourceSteps[scheme][2].count }}
+      </div>
+    </div>
+    <div class="flex flex-row space-x-4">
+      <div
+        class="rounded-full h-6 w-6"
+        :style="{ 'background-color': resourceSteps[scheme][3].color }"
+      ></div>
+      <div class="-mt-1">> {{ resourceSteps[scheme][3].count }} resources</div>
+    </div>
+
+    <div class="underline text-xs cursor-pointer" @click="changeColourScheme">
+      change colour scheme
     </div>
   </div>
 </template>
@@ -34,6 +49,20 @@ export default {
     return {
       resourceSteps,
     };
+  },
+  computed: {
+    scheme() {
+      return this.$store.state.colorScheme.scheme;
+    },
+  },
+  methods: {
+    changeColourScheme() {
+      if (this.$store.state.colorScheme.scheme === "normal") {
+        this.$store.commit("setColorScheme", { scheme: "blue" });
+      } else {
+        this.$store.commit("setColorScheme", { scheme: "normal" });
+      }
+    },
   },
 };
 </script>

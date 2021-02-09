@@ -31,15 +31,6 @@ export default {
       mapHeight: this.setMapHeight(),
       mapCentre: [14.810891, 23.962169],
       circle: {
-        color: [
-          "step",
-          ["get", "total"],
-          resourceSteps[0].color,
-          resourceSteps[0].count,
-          resourceSteps[1].color,
-          resourceSteps[1].count,
-          resourceSteps[2].color,
-        ],
         stroke: {
           width: ["step", ["zoom"], 0, 4, 1],
           color: ["step", ["zoom"], "#fff", 5, "#000"],
@@ -85,6 +76,28 @@ export default {
   computed: {
     languages() {
       return this.$store.state.languages;
+    },
+    circleColor() {
+      const scheme = this.$store.state.colorScheme.scheme;
+      return [
+        "step",
+        ["get", "total"],
+        resourceSteps[scheme][0].color,
+        resourceSteps[scheme][0].count,
+        resourceSteps[scheme][1].color,
+        resourceSteps[scheme][1].count,
+        resourceSteps[scheme][2].color,
+        resourceSteps[scheme][2].count,
+        resourceSteps[scheme][3].color,
+      ];
+    },
+    colorScheme() {
+      return this.$store.state.colorScheme.scheme;
+    },
+  },
+  watch: {
+    colorScheme: function() {
+      this.renderLanguages();
     },
   },
   mounted() {
@@ -157,7 +170,7 @@ export default {
         type: "circle",
         source: `languages`,
         paint: {
-          "circle-color": this.circle.color,
+          "circle-color": this.circleColor,
           "circle-stroke-color": this.circle.stroke.color,
           "circle-stroke-width": this.circle.stroke.width,
           "circle-radius": this.circle.radius,

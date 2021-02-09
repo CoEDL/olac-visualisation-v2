@@ -20,6 +20,9 @@ export const mutations = {
   saveLanguage(state, language) {
     state.selectedLanguage = { ...language };
   },
+  setColorScheme(state, scheme) {
+    state.colorScheme = { ...scheme };
+  },
 };
 
 export const actions = {
@@ -32,6 +35,7 @@ export default new Vuex.Store({
     countries: [],
     languages: [],
     selectedLanguage: {},
+    colorScheme: { scheme: "normal" },
   },
   mutations,
   actions,
