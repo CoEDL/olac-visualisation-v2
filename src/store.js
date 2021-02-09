@@ -42,7 +42,7 @@ export default new Vuex.Store({
     countries: [],
     languages: [],
     selectedLanguage: {},
-    colorScheme: { scheme: "normal" },
+    colorScheme: { scheme: "default" },
     showLanguageResources: { visible: false },
   },
   mutations,
