@@ -22,6 +22,9 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
 import { mapBoxStyle, accessToken, resourceSteps } from "../configuration";
 mapboxgl.accessToken = accessToken;
+import Vue from "vue";
+import LanguageDataDisplayComponent from "./LanguageDataDisplay.component.vue";
+const LanguageDataDisplayClass = Vue.extend(LanguageDataDisplayComponent);
 
 export default {
   data() {
@@ -180,7 +183,6 @@ export default {
         if (this.map.getZoom() > 3) {
           const language = e.features[0].properties;
           const coordinates = e.features[0].geometry.coordinates.slice();
-          const popupContent = `<div class="bg-gray-100 border-gray-400 border rounded p-6 text-gray-700 text-center"><div class="text-xl">${language.name}</div><div class="text-base">${language.total} resources</div></div>`;
           if (this.popup) this.popup.remove();
           this.$nextTick(() => {
             this.popup = new mapboxgl.Popup({
@@ -188,8 +190,15 @@ export default {
               maxWidth: "none",
             })
               .setLngLat(coordinates)
-              .setHTML(popupContent)
+              .setHTML('<div id="vue-popup-content"></div>')
               .addTo(this.map);
+
+            const popupInstance = new LanguageDataDisplayClass({
+              parent: this,
+              propsData: { language },
+            });
+            popupInstance.$mount("#vue-popup-content");
+            popupInstance._update();
 
             // wipe selected language on close
             const $store = this.$store;

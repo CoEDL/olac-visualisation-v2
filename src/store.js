@@ -23,6 +23,13 @@ export const mutations = {
   setColorScheme(state, scheme) {
     state.colorScheme = { ...scheme };
   },
+  toggleLanguageResources(state) {
+    state.showLanguageResources = {
+      ...{
+        visible: !state.showLanguageResources.visible,
+      },
+    };
+  },
 };
 
 export const actions = {
@@ -36,6 +43,7 @@ export default new Vuex.Store({
     languages: [],
     selectedLanguage: {},
     colorScheme: { scheme: "normal" },
+    showLanguageResources: { visible: false },
   },
   mutations,
   actions,

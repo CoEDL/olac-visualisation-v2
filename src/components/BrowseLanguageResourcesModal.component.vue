@@ -9,6 +9,7 @@
       :visible.sync="dialogVisible"
       :fullscreen="true"
       custom-class="bg-gray-100"
+      @close="handleClose"
     >
       <div slot="title" class="text-2xl p-4">
         <i class="fas fa-sign-language"></i>
@@ -50,10 +51,22 @@ export default {
     types() {
       return Object.keys(this.$store.state.selectedLanguage.summary);
     },
+    showLanguageResources() {
+      return this.$store.state.showLanguageResources;
+    },
+  },
+  watch: {
+    showLanguageResources: function() {
+      this.dialogVisible = this.$store.state.showLanguageResources.visible;
+    },
   },
   methods: {
     exploreLanguageResources() {
       this.dialogVisible = true;
+    },
+    handleClose() {
+      this.dialogVisible = false;
+      this.$store.commit("toggleLanguageResources");
     },
   },
 };
