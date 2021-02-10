@@ -3,20 +3,11 @@
     <div class="flex flex-row space-x-4">
       <div
         class="rounded-full h-6 w-6"
-        :style="{ 'background-color': resourceSteps[scheme][0].color }"
+        :style="{ 'background-color': resourceSteps[scheme][3].color }"
       ></div>
-      <div class="-mt-1">< {{ resourceSteps[scheme][0].count }} resources</div>
+      <div class="-mt-1">> {{ resourceSteps[scheme][3].count }} resources</div>
     </div>
-    <div class="flex flex-row space-x-4">
-      <div
-        class="rounded-full h-6 w-6"
-        :style="{ 'background-color': resourceSteps[scheme][1].color }"
-      ></div>
-      <div class="-mt-1">
-        {{ resourceSteps[scheme][0].count }} < resources <
-        {{ resourceSteps[scheme][1].count }}
-      </div>
-    </div>
+
     <div class="flex flex-row space-x-4">
       <div
         class="rounded-full h-6 w-6"
@@ -27,12 +18,24 @@
         {{ resourceSteps[scheme][2].count }}
       </div>
     </div>
+
     <div class="flex flex-row space-x-4">
       <div
         class="rounded-full h-6 w-6"
-        :style="{ 'background-color': resourceSteps[scheme][3].color }"
+        :style="{ 'background-color': resourceSteps[scheme][1].color }"
       ></div>
-      <div class="-mt-1">> {{ resourceSteps[scheme][3].count }} resources</div>
+      <div class="-mt-1">
+        {{ resourceSteps[scheme][0].count }} < resources <
+        {{ resourceSteps[scheme][1].count }}
+      </div>
+    </div>
+
+    <div class="flex flex-row space-x-4">
+      <div
+        class="rounded-full h-6 w-6"
+        :style="{ 'background-color': resourceSteps[scheme][0].color }"
+      ></div>
+      <div class="-mt-1">< {{ resourceSteps[scheme][0].count }} resources</div>
     </div>
 
     <div class="flex flex-row space-x-2 mt-2">
@@ -82,7 +85,7 @@ export default {
       schemes.forEach(scheme => {
         colors[
           scheme
-        ] = `linear-gradient(to right, ${resourceSteps[scheme][1].color}, ${resourceSteps[scheme][2].color}, ${resourceSteps[scheme][3].color})`;
+        ] = `linear-gradient(to right, ${resourceSteps[scheme][3].color}, ${resourceSteps[scheme][2].color}, ${resourceSteps[scheme][1].color})`;
       });
       return colors;
     },
