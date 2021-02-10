@@ -5,7 +5,7 @@ module.exports = {
   configureWebpack: {
     plugins: [
       new CopyPlugin({
-        patterns: [{ from: "data-processor/data", to: "repository" }],
+        patterns: [{ from: "data", to: "repository" }],
       }),
     ],
   },
