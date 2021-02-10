@@ -98,9 +98,6 @@ export default {
     selectedLanguage() {
       return this.$store.state.selectedLanguage;
     },
-    otherNamesAndDialects() {
-      return this.selectedLanguage.otherNamesAndDialects.join(", ");
-    },
     types() {
       return Object.keys(this.$store.state.selectedLanguage.summary);
     },

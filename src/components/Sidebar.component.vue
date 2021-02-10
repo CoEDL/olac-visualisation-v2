@@ -9,7 +9,8 @@
     </div>
     <about-component />
     <legend-component class="p-6 border border-gray-200" />
-    <data-inspector-component class="mt-2" />
+    <data-inspector-component />
+    <browse-language-resources-modal-component />
   </div>
 </template>
 
@@ -17,12 +18,15 @@
 import LegendComponent from "./Legend.component.vue";
 import AboutComponent from "./About.component.vue";
 import DataInspectorComponent from "./DataInspector.component.vue";
+import BrowseLanguageResourcesModalComponent from "./BrowseLanguageResourcesModal.component.vue";
 const logo = require("@/assets/logo.png");
+
 export default {
   components: {
     AboutComponent,
     LegendComponent,
     DataInspectorComponent,
+    BrowseLanguageResourcesModalComponent,
   },
   data() {
     return {
