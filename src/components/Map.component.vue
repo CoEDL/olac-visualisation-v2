@@ -116,7 +116,7 @@ export default {
     },
     setMapHeight() {
       if (window.innerWidth < 1024) {
-        return `${window.innerHeight - 80}px`;
+        return `${window.innerHeight - 75}px`;
       } else {
         return `${window.innerHeight}px`;
       }
