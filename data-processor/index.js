@@ -54,6 +54,8 @@ const args = require("yargs/yargs")(process.argv.slice(2)).options({
   await ensureDir(areaDataPath);
   await ensureDir(countryDataPath);
   await ensureDir(languageDataPath);
+  await ensureDir(path.join(languageDataPath, "html"));
+  await ensureDir(path.join(languageDataPath, "json"));
   await ensureDir(indexesDataPath);
 
   // get world country data files - data and geojson
