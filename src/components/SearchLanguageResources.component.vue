@@ -16,7 +16,7 @@
     <div v-if="!disableSearch" class="flex flex-col space-y-4">
       <el-radio-group
         v-model="resourcesToSearch"
-        class="flex flex-row"
+        class="flex flex-row flex-wrap justify-center xl:justify-start"
         @change="handleTypeFilterSelection"
       >
         <el-radio-button label="all" size="small"></el-radio-button>
