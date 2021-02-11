@@ -8,8 +8,8 @@
       <div class="text-base text-center">data visualisation</div>
     </div>
     <about-component />
-    <legend-component class="p-6 border border-gray-200" />
-    <data-inspector-component />
+    <legend-component class="p-6 border border-gray-200 text-xs xl:text-base" />
+    <data-inspector-component class="hidden xl:block" />
     <browse-language-resources-modal-component />
   </div>
 </template>
