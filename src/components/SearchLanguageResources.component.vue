@@ -50,24 +50,12 @@
       </div>
       <!-- search results -->
       <div class="flex flex-col space-y-2">
-        <div v-for="(result, idx) of results" :key="result.id">
-          <div class="flex flex-row">
-            <div class="flex flex-col">
-              <div class="w-10">{{ idx + 1 }}.</div>
-            </div>
-            <div class="text-base flex flex-col">
-              <div class="flex-grow flex flex-row">
-                <a
-                  :href="result.resourceLink.url"
-                  target="_name"
-                  class="text-yellow-600 hover:underline"
-                  >{{ result.resourceName }}</a
-                >
-              </div>
-              <div class="text-sm">{{ result.type }}</div>
-            </div>
-          </div>
-        </div>
+        <search-result-component
+          v-for="(result, idx) of results"
+          :key="result.id"
+          :idx="idx"
+          :data="result"
+        />
       </div>
     </div>
   </div>
@@ -76,9 +64,12 @@
 <script>
 import { flattenDeep, debounce } from "lodash";
 import Fuse from "fuse.js";
+import SearchResultComponent from "./SearchResult.component.vue";
 
 export default {
-  components: {},
+  components: {
+    SearchResultComponent,
+  },
   data() {
     return {
       debouncedSearchResources: debounce(this.searchResources, 800),
