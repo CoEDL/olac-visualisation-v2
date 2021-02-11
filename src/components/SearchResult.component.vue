@@ -25,10 +25,12 @@
           </a>
         </div>
       </div>
-      <div v-if="noRef" class="flex flex-row space-x-2 p-6 bg-blue-100 rounded">
+      <div
+        v-if="noRef || noOlacPage"
+        class="flex flex-row space-x-2 p-6 bg-red-100 rounded"
+      >
         <div>
-          Unable to get a direct link to this resource. View the entry at the
-          OLAC site.
+          {{ errorMessage }}
         </div>
         <div>
           <a
@@ -71,21 +73,27 @@ export default {
     return {
       href: undefined,
       noRef: undefined,
+      noOlacPage: undefined,
+      errorMessage: "",
     };
   },
   methods: {
     async loadResourceData() {
       let baseUrl = "https://language-archives.services/olacvis/olac/item";
-      let resource = this.data.resourceLink.url.split("/").pop();
+      let resource = this.data.resourceLink.url
+        .split("http://www.language-archives.org/item")
+        .pop();
       let response;
       try {
         response = await fetch(`${baseUrl}/${resource}`);
       } catch (error) {
-        // do nothing
         this.noRef = true;
+        this.errorMessage =
+          "Unable to get a direct link to this resource. View the entry at the OLAC site.";
       }
       if (response.status !== 200) {
-        // error
+        this.noOlacPage = true;
+        this.errorMessage = "Unable to get the original OLAC entry.";
       }
       let doc = await response.text();
       doc = dom.parseFromString(doc);
