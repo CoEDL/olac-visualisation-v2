@@ -3,7 +3,7 @@ import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
 
-import ShellComponent from "@/components/Shell.component.vue";
+import ShellComponent from "./components/Shell.component.vue";
 
 const routes = [
   {
@@ -15,7 +15,7 @@ const routes = [
 
 const router = new VueRouter({
   mode: "history",
-  base: process.env.BASE_URL,
+  base: process.env.NODE_ENV === "production" ? "/olacvis/" : "/",
   routes,
 });
 
