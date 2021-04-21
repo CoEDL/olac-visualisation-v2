@@ -24,10 +24,10 @@ module.exports = {
       template: "./public/index.html",
     }),
     new VueLoaderPlugin(),
+    new MiniCssExtractPlugin(),
     new CopyPlugin({
       patterns: [{ from: "data", to: "repository" }],
     }),
-    new MiniCssExtractPlugin(),
   ],
   module: {
     rules: [
