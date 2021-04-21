@@ -11,6 +11,11 @@
     <legend-component class="p-6 border border-gray-200 text-xs xl:text-base" />
     <data-inspector-component class="hidden xl:block" />
     <browse-language-resources-modal-component />
+    <div class="text-yellow-600 hover:underline ml-4">
+      <router-link to="/stats"
+        ><i class="fas fa-chevron-right"></i>&nbsp;browse the data</router-link
+      >
+    </div>
   </div>
 </template>
 

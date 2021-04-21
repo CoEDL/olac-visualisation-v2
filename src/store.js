@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { debounce } from "lodash";
+import { debounce, orderBy } from "lodash";
 const repository =
   process.env.NODE_ENV === "development"
     ? "/repository"
@@ -64,8 +64,9 @@ async function loadData({ commit }) {
     console.log(`Unable to load country data`);
     return;
   }
+  2;
   let countries = await response.json();
-  commit("saveCountries", countries);
+  commit("saveCountries", orderBy(countries, "name"));
 }
 
 async function loadLanguage({ commit }, { code }) {
@@ -79,4 +80,17 @@ async function loadLanguage({ commit }, { code }) {
   }
   let language = await response.json();
   commit("saveLanguage", language);
+}
+
+export async function loadCountryData({ code }) {
+  let response = await fetch(`${repository}/indexes/${code}.json`);
+  if (response.status !== 200) {
+    console.log(`Unable to load country data`);
+    return;
+  }
+  return await response.json();
+}
+
+export function getDataDownloadUrl(file) {
+  return `${repository}/${file}`;
 }

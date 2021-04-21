@@ -14,9 +14,9 @@
 
     <div>
       Clearly, major languages have enormous amounts of information available,
-      but for many of the world's languages, as will be seen on this site,
-      little or nothing has been recorded or is available via one of the
-      participating archives.
+      but for many of the world's languages, as is shown on this site, little or
+      nothing has been recorded or is available via one of the participating
+      archives.
     </div>
   </div>
 </template>
