@@ -37,6 +37,10 @@ const args = require("yargs/yargs")(process.argv.slice(2)).options({
     default: true,
     type: "boolean",
   },
+  languages: {
+    default: true,
+    type: "boolean",
+  },
 }).argv;
 
 (async () => {
@@ -96,38 +100,40 @@ const args = require("yargs/yargs")(process.argv.slice(2)).options({
   }
 
   // download language data files and extract the data
-  for (let code of Object.keys(languageDataFiles).sort()) {
-    let language = languageDataFiles[code];
-    if (args.download) {
-      await downloadFile({
-        folder: path.join(languageDataPath, "html"),
-        url: language.dataFile,
-        verbose,
-      });
-    }
-
-    let htmlFile = path.join(languageDataPath, "html", `${code}.html`);
-    let jsonFile = path.join(languageDataPath, "json", `${code}.json`);
-
-    if (args.extract) {
-      if (verbose) console.log(`Extracting data ${htmlFile}`);
-      let data = await extractLanguageData({ file: htmlFile });
-
-      let coords = languageCoordinateData[code];
-      if (!coords) {
-        console.log(`ERROR: Couldn't find coordinates for ${code}`);
-      } else {
-        coords.properties.name = languageDataFiles[code].name;
-        coords.properties.total = data.totalResources;
-        // coords.properties.summary = data.summary;
-        // coords.properties.dataFile = languageDataFiles[code].dataFile;
-        data = {
-          ...data,
-          ...languageDataFiles[code],
-          geojson: coords,
-        };
+  if (args.languages) {
+    for (let code of Object.keys(languageDataFiles).sort()) {
+      let language = languageDataFiles[code];
+      if (args.download) {
+        await downloadFile({
+          folder: path.join(languageDataPath, "html"),
+          url: language.dataFile,
+          verbose,
+        });
       }
-      await writeFile(jsonFile, JSON.stringify(data));
+
+      let htmlFile = path.join(languageDataPath, "html", `${code}.html`);
+      let jsonFile = path.join(languageDataPath, "json", `${code}.json`);
+
+      if (args.extract) {
+        if (verbose) console.log(`Extracting data ${htmlFile}`);
+        let data = await extractLanguageData({ file: htmlFile });
+
+        let coords = languageCoordinateData[code];
+        if (!coords) {
+          console.log(`ERROR: Couldn't find coordinates for ${code}`);
+        } else {
+          coords.properties.name = languageDataFiles[code].name;
+          coords.properties.total = data.totalResources;
+          // coords.properties.summary = data.summary;
+          // coords.properties.dataFile = languageDataFiles[code].dataFile;
+          data = {
+            ...data,
+            ...languageDataFiles[code],
+            geojson: coords,
+          };
+        }
+        await writeFile(jsonFile, JSON.stringify(data));
+      }
     }
   }
 
@@ -159,13 +165,39 @@ const args = require("yargs/yargs")(process.argv.slice(2)).options({
     }
     return country;
   });
-  await writeJSON(path.join(indexesDataPath, "countries.json"), countries);
+  // await writeJSON(path.join(indexesDataPath, "countries.json"), countries);
+  for (let country of countries) {
+    let languages = {};
+    for (let language of country.languages) {
+      language = await readJSON(
+        path.join(languageDataPath, "json", `${language.code}.json`)
+      );
+      languages[language.code] = language;
+    }
+    country.languages = country.languages.map(language => {
+      return {
+        ...language,
+        summary: languages[language.code].summary,
+        totalResources: languages[language.code].totalResources,
+        dataUrl: path.join("languages", "json", `${language.code}.json`),
+      };
+    });
+    await writeJSON(
+      path.join(indexesDataPath, `${country.code}.json`),
+      country
+    );
+  }
+  await writeJSON(
+    path.join(indexesDataPath, "countries.json"),
+    countries.map(c => ({ name: c.name, code: c.code }))
+  );
 
   //  write languages index
   files = await readdir(path.join(languageDataPath, "json"));
   let languages = [];
   for (let file of files) {
     let data = await readJSON(path.join(languageDataPath, "json", file));
+    data.dataUrl = path.join("languages", "json", file);
     if (data.geojson?.geometry?.coordinates.length)
       languages.push(data.geojson);
   }
