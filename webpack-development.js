@@ -11,6 +11,7 @@ const configuration = merge(common, {
     port: 8080,
     historyApiFallback: true,
     writeToDisk: true,
+    hot: true,
   },
 });
 
