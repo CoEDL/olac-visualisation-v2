@@ -8,14 +8,14 @@
       <div class="text-base text-center">data visualisation</div>
     </div>
     <about-component />
+    <div class="text-yellow-600 hover:underline text-lg">
+      <router-link to="/stats">
+        <i class="fas fa-chart-bar"></i>&nbsp;browse the data by country
+      </router-link>
+    </div>
     <legend-component class="p-6 border border-gray-200 text-xs xl:text-base" />
     <data-inspector-component class="hidden xl:block" />
     <browse-language-resources-modal-component />
-    <div class="text-yellow-600 hover:underline ml-4 text-xl">
-      <router-link to="/stats">
-        <i class="fas fa-chart-bar"></i>&nbsp;browse the data
-      </router-link>
-    </div>
   </div>
 </template>
 
