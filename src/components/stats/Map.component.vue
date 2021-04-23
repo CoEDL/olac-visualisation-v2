@@ -38,8 +38,7 @@ export default {
       this.map = new mapboxgl.Map({
         container: this.$refs.map,
         style: mapBoxStyle,
-        dragRotate: false,
-        touchPitch: false,
+        interactive: false,
         zoom: 1,
         minZoom: 1,
         maxZoom: 7,
