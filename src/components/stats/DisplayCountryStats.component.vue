@@ -36,7 +36,7 @@
         <el-table-column prop="name" label="Name" width="300">
         </el-table-column>
         <el-table-column prop="code" label="code" width="60"> </el-table-column>
-        <el-table-column prop="totalResources" width="62" label="Count">
+        <el-table-column prop="totalResources" width="80" label="Count">
         </el-table-column>
         <el-table-column prop="summary" label="Summary">
           <template slot-scope="scope" class="flex flex-col">
