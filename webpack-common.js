@@ -12,18 +12,18 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].[fullhash].bundle.js",
-    publicPath: process.env.NODE_ENV === "production" ? "/olacvis/" : "/",
+    publicPath: "/",
   },
   plugins: [
     new CleanWebpackPlugin({
-      cleanOnceBeforeBuildPatterns: ["*.js", "*.css"],
+      cleanOnceBeforeBuildPatterns: ["*.js", "*.css", "*.txt"],
     }),
     new HtmlWebpackPlugin({
-      title: "50words",
+      title: "Language Archives OLAC Visualisation",
       template: "./public/index.html",
     }),
     new VueLoaderPlugin(),
-    new MiniCssExtractPlugin(),
+    new MiniCssExtractPlugin({ filename: "[name].[fullhash].bundle.css" }),
   ],
   module: {
     rules: [
