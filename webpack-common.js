@@ -11,7 +11,7 @@ module.exports = {
   entry: ["./src/main.js"],
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "[name].[fullhash].bundle.js",
+    filename: "[contenthash].js",
     publicPath: "/",
   },
   plugins: [
@@ -23,7 +23,7 @@ module.exports = {
       template: "./public/index.html",
     }),
     new VueLoaderPlugin(),
-    new MiniCssExtractPlugin({ filename: "[name].[fullhash].bundle.css" }),
+    new MiniCssExtractPlugin({ filename: "[contenthash].css" }),
   ],
   module: {
     rules: [
