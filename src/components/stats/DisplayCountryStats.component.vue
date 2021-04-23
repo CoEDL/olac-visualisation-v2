@@ -10,9 +10,18 @@
           <div>Region: {{ country.region }}</div>
           <div>Sub-region: {{ country["sub-region"] }}</div>
           <div>Number of languages: {{ totalLanguages }}</div>
+          <div class="my-2">
+            <el-button
+              @click="assembleCSV"
+              size="mini"
+              class="text-yellow-600 hover:underline"
+            >
+              <i class="fas fa-file-download"></i>&nbsp;download data as
+              CSV</el-button
+            >
+          </div>
         </div>
       </div>
-      <!-- <pre>{{ country }}</pre> -->
       <div class="mt-10 mb-4 border-b border-solid">Language Resources</div>
       <div>
         <el-pagination
@@ -33,7 +42,7 @@
           <template slot-scope="scope" class="flex flex-col">
             <ul>
               <render-language-statistic-component
-                type="Primary text"
+                type="Primary texts"
                 :summary="scope.row.summary"
               />
               <render-language-statistic-component
@@ -76,6 +85,7 @@
 </template>
 
 <script>
+import { uniq, flattenDeep } from "lodash";
 import MapComponent from "./Map.component.vue";
 import RenderLanguageStatisticComponent from "./RenderLanguageStatistic.component.vue";
 import { getDataDownloadUrl } from "src/store";
@@ -109,7 +119,48 @@ export default {
       );
     },
   },
+  mounted() {},
   methods: {
+    assembleCSV() {
+      let resourceTypes = this.country.languages.map(c =>
+        Object.keys(c.summary)
+      );
+      resourceTypes = uniq(flattenDeep(resourceTypes)).sort();
+
+      let csv = [
+        "code",
+        "name",
+        "olacSource",
+        "olacvisDataFile",
+        "total",
+        ...resourceTypes,
+      ];
+      let data = this.country.languages.map(c => {
+        return flattenDeep([
+          c.code,
+          c.name,
+          c.dataFile,
+          `${window.origin}${this.getUrl(c.dataUrl)}`,
+          c.totalResources,
+          resourceTypes.map(t => c.summary[t] || 0),
+        ]);
+      });
+      csv = [csv, ...data];
+      csv = csv.map(e => e.join(",")).join("\n");
+      const element = document.createElement("a");
+      element.setAttribute(
+        "href",
+        "data:text/csv;charset=utf-8," + encodeURIComponent(csv)
+      );
+      element.setAttribute(
+        "download",
+        `${this.country.code}-${encodeURIComponent(this.country.name)}-data.csv`
+      );
+      element.style.display = "none";
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    },
     getUrl(file) {
       return getDataDownloadUrl(file);
     },
