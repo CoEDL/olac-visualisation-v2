@@ -10,7 +10,7 @@ const configuration = merge(common, {
     minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
   },
   output: {
-    publicPath: "/olacvis",
+    publicPath: "/olacvis/",
   },
 });
 
