@@ -1,6 +1,7 @@
 const path = require("path");
 const merge = require("webpack-merge");
 const common = require("./webpack-common");
+const CopyPlugin = require("copy-webpack-plugin");
 
 const configuration = merge(common, {
   mode: "development",
@@ -13,6 +14,11 @@ const configuration = merge(common, {
     writeToDisk: true,
     hot: true,
   },
+  plugins: [
+    new CopyPlugin({
+      patterns: [{ from: "data", to: "repository" }],
+    }),
+  ],
 });
 
 module.exports = configuration;
