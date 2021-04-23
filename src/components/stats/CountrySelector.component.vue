@@ -1,13 +1,11 @@
 <template>
   <div>
-    <div>Select a country to view statistics</div>
-
     <el-select
       class="w-full"
       v-model="selectedCountry"
       clearable
       filterable
-      placeholder="Select a country to view statistics"
+      placeholder="Select a country"
       @change="loadCountryStatistics"
     >
       <el-option
