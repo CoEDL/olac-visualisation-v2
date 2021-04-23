@@ -8,35 +8,49 @@
         <div>Alpha-3: {{ country["alpha-3"] }}</div>
         <div>Region: {{ country.region }}</div>
         <div>Sub-region: {{ country["sub-region"] }}</div>
+        <div>Number of languages: {{ totalLanguages }}</div>
       </div>
     </div>
     <!-- <pre>{{ country }}</pre> -->
     <div class="mt-10 mb-4 border-b border-solid">Language Resources</div>
-    <el-table :data="country.languages" style="width: 100%">
+    <div>
+      <el-pagination
+        layout="prev, pager, next"
+        :total="totalLanguages"
+        :page-size="pageSize"
+        @current-change="changePage"
+      >
+      </el-pagination>
+    </div>
+    <el-table :data="languages" style="width: 100%">
       <el-table-column prop="name" label="Name" width="300"> </el-table-column>
       <el-table-column prop="code" label="code" width="60"> </el-table-column>
       <el-table-column prop="totalResources" width="62" label="Count">
       </el-table-column>
       <el-table-column prop="summary" label="Summary">
         <template slot-scope="scope" class="flex flex-col">
-          <div v-if="scope.row.summary['Primary Texts']">
-            Primary Texts: {{ scope.row.summary["Primary Texts"] }}
-          </div>
-          <div v-if="scope.row.summary['Lexical Resources']">
-            Lexical Resources: {{ scope.row.summary["Lexical Resources"] }}
-          </div>
-          <div v-if="scope.row.summary['Language Descriptions']">
-            Language Descriptions:
-            {{ scope.row.summary["Language Descriptions"] }}
-          </div>
-          <div v-if="scope.row.summary['Other resources about the language']">
-            Other resources about the language:
-            {{ scope.row.summary["Other resources about the language"] }}
-          </div>
-          <div v-if="scope.row.summary['Other resources in the language']">
-            Other resources in the language:
-            {{ scope.row.summary["Other resources in the language"] }}
-          </div>
+          <ul>
+            <render-language-statistic-component
+              type="Primary text"
+              :summary="scope.row.summary"
+            />
+            <render-language-statistic-component
+              type="Lexical resources"
+              :summary="scope.row.summary"
+            />
+            <render-language-statistic-component
+              type="Language descriptions"
+              :summary="scope.row.summary"
+            />
+            <render-language-statistic-component
+              type="Other resources about the language"
+              :summary="scope.row.summary"
+            />
+            <render-language-statistic-component
+              type="Other resources in the language"
+              :summary="scope.row.summary"
+            />
+          </ul>
         </template>
       </el-table-column>
       <el-table-column
@@ -60,10 +74,12 @@
 
 <script>
 import MapComponent from "./Map.component.vue";
+import RenderLanguageStatisticComponent from "./RenderLanguageStatistic.component.vue";
 import { getDataDownloadUrl } from "src/store";
 export default {
   components: {
     MapComponent,
+    RenderLanguageStatisticComponent,
   },
   props: {
     country: {
@@ -72,7 +88,23 @@ export default {
     },
   },
   data() {
-    return {};
+    return {
+      page: 0,
+      pageSize: 10,
+    };
+  },
+  computed: {
+    totalLanguages: function() {
+      return this.country.languages.length;
+    },
+    languages: function() {
+      let page = this.page;
+      let pageSize = this.pageSize;
+      return this.country.languages.slice(
+        page * pageSize,
+        page * pageSize + pageSize
+      );
+    },
   },
   methods: {
     getUrl(file) {
@@ -80,6 +112,9 @@ export default {
     },
     getDownloadName(code) {
       return `${code}.json`;
+    },
+    changePage(page) {
+      this.page = page - 1;
     },
   },
 };
