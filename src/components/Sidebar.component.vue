@@ -23,7 +23,8 @@
 import LegendComponent from "./Legend.component.vue";
 import AboutComponent from "./About.component.vue";
 import DataInspectorComponent from "./DataInspector.component.vue";
-import BrowseLanguageResourcesModalComponent from "./BrowseLanguageResourcesModal.component.vue";
+const BrowseLanguageResourcesModalComponent = () =>
+  import("./BrowseLanguageResourcesModal.component.vue");
 const logo = require("@/assets/logo.png");
 
 export default {
