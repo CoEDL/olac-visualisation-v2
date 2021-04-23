@@ -66,7 +66,7 @@ module.exports = {
         test: /\.(woff|woff2|ttf|eot|svg|png|jp(e*)g|gif|mp4)?$/,
         loader: "file-loader",
         options: {
-          name: "assets/[contenthash].[ext]",
+          name: "/assets/[contenthash].[ext]",
           esModule: false,
         },
       },
