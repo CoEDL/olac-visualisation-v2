@@ -3,9 +3,20 @@
     <div class="flex flex-row space-x-4">
       <div
         class="rounded-full h-6 w-6"
+        :style="{ 'background-color': resourceSteps[scheme][4].color }"
+      ></div>
+      <div class="-mt-1">> {{ resourceSteps[scheme][4].count }} resources</div>
+    </div>
+
+    <div class="flex flex-row space-x-4">
+      <div
+        class="rounded-full h-6 w-6"
         :style="{ 'background-color': resourceSteps[scheme][3].color }"
       ></div>
-      <div class="-mt-1">> {{ resourceSteps[scheme][3].count }} resources</div>
+      <div class="-mt-1">
+        {{ resourceSteps[scheme][2].count }} < resources <
+        {{ resourceSteps[scheme][3].count }}
+      </div>
     </div>
 
     <div class="flex flex-row space-x-4">
@@ -85,7 +96,7 @@ export default {
       schemes.forEach(scheme => {
         colors[
           scheme
-        ] = `linear-gradient(to right, ${resourceSteps[scheme][3].color}, ${resourceSteps[scheme][2].color}, ${resourceSteps[scheme][1].color})`;
+        ] = `linear-gradient(to right, ${resourceSteps[scheme][4].color}, ${resourceSteps[scheme][3].color}, ${resourceSteps[scheme][2].color})`;
       });
       return colors;
     },

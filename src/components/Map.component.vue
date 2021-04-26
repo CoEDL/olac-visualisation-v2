@@ -92,6 +92,8 @@ export default {
         resourceSteps[scheme][2].color,
         resourceSteps[scheme][2].count,
         resourceSteps[scheme][3].color,
+        resourceSteps[scheme][3].count,
+        resourceSteps[scheme][4].color,
       ];
     },
     colorScheme() {
