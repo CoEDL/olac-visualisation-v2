@@ -12,22 +12,37 @@
           {{ data.resourceName }}
         </div>
       </div>
-      <div v-if="href" class="flex flex-row space-x-2 p-6 bg-blue-100 rounded">
-        <div>View the original resource</div>
-        <div>
-          <a
-            :href="href"
-            target="_blank"
-            class="text-yellow-600 hover:underline cursor-pointer"
-          >
-            {{ href }}
-            <i class="fas fa-external-link-alt"></i>
-          </a>
+      <div class="flex flex-col space-y-2 bg-blue-100 rounded p-6" v-if="href">
+        <div class="flex flex-row space-x-2">
+          <div>View the original resource</div>
+          <div>
+            <a
+              :href="href"
+              target="_blank"
+              class="text-yellow-600 hover:underline cursor-pointer"
+            >
+              {{ href }}
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+          </div>
+        </div>
+        <div class="text-xs flex flex-row space-x-2">
+          <div>View the olac page</div>
+          <div>
+            <a
+              :href="data.resourceLink.url"
+              target="_blank"
+              class="text-yellow-600 hover:underline cursor-pointer"
+            >
+              {{ data.resourceLink.url }}
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+          </div>
         </div>
       </div>
       <div
         v-if="noRef || noOlacPage"
-        class="flex flex-row space-x-2 p-6 bg-red-100 rounded"
+        class="flex flex-row p-6 space-x-2 bg-red-100 rounded"
       >
         <div>
           {{ errorMessage }}
@@ -37,7 +52,7 @@
             :href="data.resourceLink.url"
             target="_blank"
             class="text-yellow-600 hover:underline"
-            >{{ data.resourceName }}</a
+            >View the OLAC entry for more information.</a
           >
         </div>
       </div>
@@ -88,8 +103,7 @@ export default {
         response = await fetch(`${baseUrl}/${resource}`);
       } catch (error) {
         this.noRef = true;
-        this.errorMessage =
-          "Unable to get a direct link to this resource. View the entry at the OLAC site.";
+        this.errorMessage = "Unable to get a direct link to this resource.";
       }
       if (response.status !== 200) {
         this.noOlacPage = true;
@@ -106,6 +120,10 @@ export default {
         }
       }
       this.href = originalResource;
+      if (!this.href) {
+        this.noRef = true;
+        this.errorMessage = "The OLAC entry does not specify a source.";
+      }
     },
   },
 };
