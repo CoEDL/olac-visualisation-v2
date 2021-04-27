@@ -235,26 +235,15 @@ export default {
       });
     },
     centerMapAndZoomOut() {
+      this.removeLayersAndPopups();
       this.map.flyTo({
         center: this.mapCentre,
         zoom: 1,
         bearing: 0,
       });
-      if (this.map.getLayer("country")) {
-        this.map.removeLayer("country");
-      }
-      if (this.map.getSource("country")) {
-        this.map.removeSource("country");
-      }
     },
     zoomToCountry({ box, country }) {
-      if (this.popup) this.popup.remove();
-      if (this.map.getLayer("country")) {
-        this.map.removeLayer("country");
-      }
-      if (this.map.getSource("country")) {
-        this.map.removeSource("country");
-      }
+      this.removeLayersAndPopups();
       this.$nextTick(() => {
         this.map.fitBounds(box, { padding: 20 });
         this.map.addSource(`country`, {
@@ -273,8 +262,18 @@ export default {
       });
     },
     zoomToLanguage({ box, language }) {
+      this.removeLayersAndPopups();
       this.map.fitBounds(box, { padding: 20 });
       this.showLanguagePopup(language);
+    },
+    removeLayersAndPopups() {
+      if (this.map.getLayer("country")) {
+        this.map.removeLayer("country");
+      }
+      if (this.map.getSource("country")) {
+        this.map.removeSource("country");
+      }
+      if (this.popup) this.popup.remove();
     },
   },
 };
