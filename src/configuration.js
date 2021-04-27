@@ -35,3 +35,10 @@ export const resourceSteps = {
     { count: 500, color: "#d94701" },
   ],
 };
+
+export const countryBounds = {
+  default: "#19b5fe",
+  blue: "#f27935",
+  purple: "#f27935",
+  orange: "#19b5fe",
+};

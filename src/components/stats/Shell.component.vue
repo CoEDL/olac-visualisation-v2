@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import CountrySelectorComponent from "./CountrySelector.component.vue";
+import CountrySelectorComponent from "../CountrySelector.component.vue";
 import DisplayCountryStatsComponent from "./DisplayCountryStats.component.vue";
 export default {
   components: {

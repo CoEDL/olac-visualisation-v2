@@ -8,10 +8,13 @@
       <div class="text-base text-center">data visualisation</div>
     </div>
     <about-component />
-    <div class="text-yellow-600 hover:underline text-lg">
-      <router-link to="/stats">
-        <i class="fas fa-chart-bar"></i>&nbsp;browse the data by country
-      </router-link>
+    <div class="flex flex-row">
+      <div class="text-yellow-600 hover:underline text-lg flex-grow">
+        <router-link to="/stats">
+          <i class="fas fa-chart-bar"></i>&nbsp;browse the data by country
+        </router-link>
+      </div>
+      <controls-modal-component />
     </div>
     <legend-component class="p-6 border border-gray-200 text-xs xl:text-base" />
     <data-inspector-component class="hidden xl:block" />
@@ -25,6 +28,7 @@ import AboutComponent from "./About.component.vue";
 import DataInspectorComponent from "./DataInspector.component.vue";
 const BrowseLanguageResourcesModalComponent = () =>
   import("./BrowseLanguageResourcesModal.component.vue");
+import ControlsModalComponent from "./ControlsModal.component.vue";
 const logo = require("@/assets/logo.png");
 
 export default {
@@ -33,6 +37,7 @@ export default {
     LegendComponent,
     DataInspectorComponent,
     BrowseLanguageResourcesModalComponent,
+    ControlsModalComponent,
   },
   data() {
     return {

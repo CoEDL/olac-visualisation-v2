@@ -15,6 +15,8 @@ import locale from "element-ui/lib/locale/lang/en";
 Vue.use(ElementUI, { locale });
 Vue.config.productionTip = false;
 
+export const EventBus = new Vue();
+
 new Vue({
   router,
   store,

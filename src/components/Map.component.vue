@@ -20,11 +20,17 @@
 <script>
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
-import { mapBoxStyle, accessToken, resourceSteps } from "../configuration";
+import {
+  mapBoxStyle,
+  accessToken,
+  resourceSteps,
+  countryBounds,
+} from "../configuration";
 mapboxgl.accessToken = accessToken;
 import Vue from "vue";
 import LanguageDataDisplayComponent from "./LanguageDataDisplay.component.vue";
 const LanguageDataDisplayClass = Vue.extend(LanguageDataDisplayComponent);
+import { EventBus } from "src/main";
 
 export default {
   data() {
@@ -107,6 +113,8 @@ export default {
   },
   mounted() {
     this.renderMap();
+    EventBus.$on("zoomToCountry", this.zoomToCountry);
+    EventBus.$on("zoomToLanguage", this.zoomToLanguage);
   },
   methods: {
     setMapWidth() {
@@ -183,33 +191,7 @@ export default {
       });
       this.map.on("click", "languages", e => {
         if (this.map.getZoom() > 3) {
-          const language = e.features[0].properties;
-          const coordinates = e.features[0].geometry.coordinates.slice();
-          if (this.popup) this.popup.remove();
-          this.$nextTick(() => {
-            this.popup = new mapboxgl.Popup({
-              closeButton: false,
-              maxWidth: "none",
-            })
-              .setLngLat(coordinates)
-              .setHTML('<div id="vue-popup-content"></div>')
-              .addTo(this.map);
-
-            const popupInstance = new LanguageDataDisplayClass({
-              parent: this,
-              propsData: { language },
-            });
-            popupInstance.$mount("#vue-popup-content");
-            popupInstance._update();
-
-            // wipe selected language on close
-            const $store = this.$store;
-            this.popup.on("close", function() {
-              $store.dispatch("loadLanguage", {});
-            });
-            // load selected language data
-            this.$store.dispatch("loadLanguage", { code: language.code });
-          });
+          this.showLanguagePopup(e.features[0]);
         }
       });
       this.map.on("mouseenter", "languages", () => {
@@ -223,12 +205,76 @@ export default {
         }
       });
     },
+    showLanguagePopup(language) {
+      const coordinates = language.geometry.coordinates.slice();
+      language = language.properties;
+      if (this.popup) this.popup.remove();
+      this.$nextTick(() => {
+        this.popup = new mapboxgl.Popup({
+          closeButton: false,
+          maxWidth: "none",
+        })
+          .setLngLat(coordinates)
+          .setHTML('<div id="vue-popup-content"></div>')
+          .addTo(this.map);
+
+        const popupInstance = new LanguageDataDisplayClass({
+          parent: this,
+          propsData: { language },
+        });
+        popupInstance.$mount("#vue-popup-content");
+        popupInstance._update();
+
+        // wipe selected language on close
+        const $store = this.$store;
+        this.popup.on("close", function() {
+          $store.dispatch("loadLanguage", {});
+        });
+        // load selected language data
+        this.$store.dispatch("loadLanguage", { code: language.code });
+      });
+    },
     centerMapAndZoomOut() {
       this.map.flyTo({
         center: this.mapCentre,
         zoom: 1,
         bearing: 0,
       });
+      if (this.map.getLayer("country")) {
+        this.map.removeLayer("country");
+      }
+      if (this.map.getSource("country")) {
+        this.map.removeSource("country");
+      }
+    },
+    zoomToCountry({ box, country }) {
+      if (this.popup) this.popup.remove();
+      if (this.map.getLayer("country")) {
+        this.map.removeLayer("country");
+      }
+      if (this.map.getSource("country")) {
+        this.map.removeSource("country");
+      }
+      this.$nextTick(() => {
+        this.map.fitBounds(box, { padding: 20 });
+        this.map.addSource(`country`, {
+          type: "geojson",
+          data: country.geojson,
+        });
+        this.map.addLayer({
+          id: `country`,
+          type: "line",
+          source: `country`,
+          paint: {
+            "line-color": countryBounds[this.$store.state.colorScheme.scheme],
+            "line-width": 3,
+          },
+        });
+      });
+    },
+    zoomToLanguage({ box, language }) {
+      this.map.fitBounds(box, { padding: 20 });
+      this.showLanguagePopup(language);
     },
   },
 };
