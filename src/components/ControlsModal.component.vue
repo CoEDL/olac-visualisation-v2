@@ -14,6 +14,7 @@
       title="Controls"
       :visible.sync="dialogVisible"
       :fullscreen="false"
+      :destroy-on-close="true"
       :append-to-body="true"
       custom-class="bg-gray-100"
     >

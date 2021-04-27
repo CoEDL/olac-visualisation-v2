@@ -4,6 +4,7 @@
       title="Explore Language Resources"
       :visible.sync="dialogVisible"
       :fullscreen="true"
+      :destroy-on-close="true"
       :append-to-body="true"
       custom-class="bg-gray-100"
       @close="handleClose"
