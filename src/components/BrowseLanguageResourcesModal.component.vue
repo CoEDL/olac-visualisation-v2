@@ -54,9 +54,9 @@ export default {
   },
   watch: {
     "selectedLanguage.name": function() {
-      if (this.selectedLanguage.name) {
+      if (this.selectedLanguage?.name) {
         this.otherNamesAndDialects =
-          this.selectedLanguage.otherNamesAndDialects.join(", ") || "";
+          this.selectedLanguage?.otherNamesAndDialects.join(", ") || "";
       }
     },
     showLanguageResources: function() {
