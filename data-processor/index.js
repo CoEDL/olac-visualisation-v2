@@ -16,6 +16,7 @@ const {
   readJSON,
   writeJSON,
   ensureDir,
+  pathExists,
 } = require("fs-extra");
 const { trim } = require("lodash");
 const configuration = require("./configuration");
@@ -110,11 +111,10 @@ const args = require("yargs/yargs")(process.argv.slice(2)).options({
           verbose,
         });
       }
-
       let htmlFile = path.join(languageDataPath, "html", `${code}.html`);
       let jsonFile = path.join(languageDataPath, "json", `${code}.json`);
 
-      if (args.extract) {
+      if (args.extract && (await pathExists(htmlFile))) {
         if (verbose) console.log(`Extracting data ${htmlFile}`);
         let data = await extractLanguageData({ file: htmlFile });
 

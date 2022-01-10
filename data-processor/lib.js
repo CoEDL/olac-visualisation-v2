@@ -77,13 +77,18 @@ async function downloadFile({ url, name, folder, verbose = false }) {
 
   if (verbose) console.log(`Downloading ${url}`);
   await ensureDir(folder);
-  let response = await fetch(url);
-  if (response.status !== 200) {
+  try {
+    let response = await fetch(url);
+    if (response.status !== 200) {
+      console.log(`Error getting ${url}`);
+      return;
+    }
+    const data = await response.text();
+    await writeFile(file, data);
+  } catch (error) {
     console.log(`Error getting ${url}`);
     return;
   }
-  const data = await response.text();
-  await writeFile(file, data);
 }
 
 async function extractAreaData({ folder }) {
