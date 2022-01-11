@@ -246,19 +246,19 @@ export default {
       this.removeLayersAndPopups();
       this.$nextTick(() => {
         this.map.fitBounds(box, { padding: 20 });
-        this.map.addSource(`country`, {
-          type: "geojson",
-          data: country.geojson,
-        });
-        this.map.addLayer({
-          id: `country`,
-          type: "line",
-          source: `country`,
-          paint: {
-            "line-color": countryBounds[this.$store.state.colorScheme.scheme],
-            "line-width": 3,
-          },
-        });
+        // this.map.addSource(`country`, {
+        //   type: "geojson",
+        //   data: country.geojson,
+        // });
+        // this.map.addLayer({
+        //   id: `country`,
+        //   type: "line",
+        //   source: `country`,
+        //   paint: {
+        //     "line-color": countryBounds[this.$store.state.colorScheme.scheme],
+        //     "line-width": 3,
+        //   },
+        // });
       });
     },
     zoomToLanguage({ box, language }) {
