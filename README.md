@@ -49,7 +49,7 @@ Options:
 ## Running in development mode
 
 ```
-npm run serve
+npm run develop
 ```
 
 ## Deploying to production
