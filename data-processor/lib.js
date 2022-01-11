@@ -11,15 +11,7 @@ const {
 const xpath = require("xpath");
 const { trim, compact, flattenDeep, sum } = require("lodash");
 const configuration = require("./configuration");
-let dom = require("xmldom").DOMParser;
-dom = new dom({
-  locator: {},
-  errorHandler: {
-    warning: () => {},
-    error: e => console.log(e),
-    fatalError: e => console.log(e),
-  },
-});
+let { DOMParser } = require("xmldom");
 
 const siteUrl = "http://www.language-archives.org";
 const areaDataFiles = [
@@ -80,13 +72,13 @@ async function downloadFile({ url, name, folder, verbose = false }) {
   try {
     let response = await fetch(url);
     if (response.status !== 200) {
-      console.log(`Error getting ${url}`);
+      console.log(`ERROR: unable to download: ${url}`);
       return;
     }
     const data = await response.text();
     await writeFile(file, data);
   } catch (error) {
-    console.log(`Error getting ${url}`);
+    console.log(`ERROR: unable to download: ${url}`);
     return;
   }
 }
@@ -104,6 +96,14 @@ async function extractAreaData({ folder }) {
 }
 
 async function extractAreaCountries({ file }) {
+  const dom = new DOMParser({
+    locator: {},
+    errorHandler: {
+      warning: () => {},
+      error: e => console.log("ERROR:", file, e.replace("\n", " - ")),
+      fatalError: e => console.log(file, e),
+    },
+  });
   const data = await readFile(file);
   const doc = dom.parseFromString(data.toString());
   let nodes = xpath.select("//body/table[2]/tr/td/ul/li", doc);
@@ -119,6 +119,14 @@ async function extractAreaCountries({ file }) {
 }
 
 async function extractCountryLanguages({ file }) {
+  const dom = new DOMParser({
+    locator: {},
+    errorHandler: {
+      warning: () => {},
+      error: e => console.log("ERROR:", file, e.replace("\n", " - ")),
+      fatalError: e => console.log(file, e),
+    },
+  });
   const data = await readFile(file);
   const doc = dom.parseFromString(data.toString());
   let nodes = xpath.select("//body/table[2]/tr/td/ul/li", doc);
@@ -133,6 +141,14 @@ async function extractCountryLanguages({ file }) {
 }
 
 async function extractLanguageData({ file }) {
+  const dom = new DOMParser({
+    locator: {},
+    errorHandler: {
+      warning: () => {},
+      error: e => console.log("ERROR:", file, e.replace("\n", " - ")),
+      fatalError: e => console.log(file, e),
+    },
+  });
   const code = path.basename(file, ".html");
   const data = await readFile(file);
   const doc = dom.parseFromString(data.toString());

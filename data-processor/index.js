@@ -169,10 +169,19 @@ const args = require("yargs/yargs")(process.argv.slice(2)).options({
   for (let country of countries) {
     let languages = {};
     for (let language of country.languages) {
-      language = await readJSON(
-        path.join(languageDataPath, "json", `${language.code}.json`)
+      let languageDataFile = path.join(
+        languageDataPath,
+        "json",
+        `${language.code}.json`
       );
-      languages[language.code] = language;
+      if (await pathExists(languageDataFile)) {
+        language = await readJSON(languageDataFile);
+        languages[language.code] = language;
+      } else {
+        languages[language.code] = {
+          error: `Language data file not available`,
+        };
+      }
     }
     country.languages = country.languages.map(language => {
       return {
